@@ -1,0 +1,100 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+@using _2doParcialPro3.Data
+@inject ProtectedLocalStorage LocalStorage;
+
+<PageTitle>Index</PageTitle>
+
+<h1>2do Parcial</h1>
+
+<input type="text" @bind="cedula" placeholder="Cedula" class="form-control" /> 
+<input type="text" @bind="nombre" placeholder="Nombre" class="form-control" />
+<input type="text" @bind="fecha" placeholder="Fecha"  class="form-control" />
+<input type="text" @bind="item" placeholder="Item Robado" class="form-control "/>
+<input type="number" @bind="valor" placeholder="Valor monetario" class="form-control" />
+<input type="text" @bind="lugar" placeholder="lugar" class="form-control" />
+<input type="text" @bind="latitud" placeholder="Latitud" class="form-control" />
+<input type="text" @bind="longitud" placeholder="Longitud" class="form-control" />
+
+<button @onclick="Guardar" class="btn btn-success">Guardar</button>
+<button @onclick="Leer" class="btn btn-success">Leer</button>
+
+<table>
+    <thead>
+        <tr>
+            <th>Cedula</th>
+            <th>Nombre</th>
+            <th>Fecha</th>
+            <th>Item Robado</th>
+            <th>Valor monetario</th>
+            <th>lugar</th>
+            <th>Latitud</th>
+            <th>Longitud</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (robosGuardados != null)
+        {
+           @foreach (var roboguardado in robosGuardados)
+            {
+                <tr>
+                    <td>@roboguardado.Cedula</td>
+                    <td>@roboguardado.Nombre</td> 
+                    <td>@roboguardado.Fecha</td> 
+                    <td>@roboguardado.Item</td> 
+                    <td>@roboguardado.Valor</td> 
+                    <td>@roboguardado.Lugar</td> 
+                    <td>@roboguardado.Latitud</td> 
+                    <td>@roboguardado.Longitud</td>                   
+                </tr>
+            }
+        }
+
+    </tbody>
+</table>
+
+@code{
+
+    Robo rob = new Robo();
+
+    string cedula;
+    string nombre;
+    string fecha;
+    string item;
+    string valor;
+    string lugar;
+    string latitud;
+    string longitud;
+
+    List<Robo> robosGuardados = new List<Robo>();
+    List<Robo> robosAhora = new List<Robo>();
+
+
+    public async Task Guardar()
+    {
+        rob.Cedula = cedula;
+        rob.Nombre = nombre;
+        rob.Fecha = fecha;
+        rob.Item = item;
+        rob.Valor = valor;
+        rob.Lugar = lugar;
+        rob.Latitud = latitud;
+        rob.Longitud = longitud;
+
+        robosGuardados.Add(rob);
+
+        await LocalStorage.SetAsync("robos", robosGuardados);
+    }
+    public async Task Leer()
+    {
+        var result = await LocalStorage.GetAsync<List<Robo>>("robos");
+        robosGuardados = result.Success ? result.Value : null;
+
+    }
+    public async Task Borrar()
+    {
+        await LocalStorage.DeleteAsync("robos");
+    }
+
+
+}
